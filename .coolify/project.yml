@@ -1,0 +1,36 @@
+project: FoodFestivalPlatform
+
+services:
+  - name: postgres
+    type: service
+    image: postgres:14
+    env:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432
+
+  - name: backend
+    type: application
+    dockerfile: backend/Dockerfile
+    env:
+      JWT_SECRET: topsecret123
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/appdb
+    depends_on:
+      - postgres
+    ports:
+      - 3000
+
+  - name: frontend
+    type: application
+    dockerfile: frontend/Dockerfile
+    env:
+      REACT_APP_API_URL: http://backend:3000
+    ports:
+      - 3000
+
+volumes:
+  - name: pgdata
